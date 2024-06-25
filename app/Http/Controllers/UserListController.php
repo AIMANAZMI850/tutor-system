@@ -20,7 +20,7 @@ class UserListController extends Controller
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
+            'password' => $validated['password'],
         ]);
     
         return redirect()->route('userlist')->with('success', 'User added successfully.');
@@ -58,7 +58,7 @@ class UserListController extends Controller
             $user->email = $request->email;
             // Update password only if provided
             if ($request->password) {
-                $user->password = Hash::make($request->password);
+                $user->password = $request->password;
             }
             $user->save();
             return redirect('userlist')->with('success', 'User updated successfully.');
