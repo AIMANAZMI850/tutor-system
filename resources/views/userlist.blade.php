@@ -23,26 +23,54 @@
             color: black;
         }
 
-        table, th, td {
-            border: 3px solid black;
-            border-collapse: collapse;
-            text-align: center;
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
         }
 
-        th, td {
+        .card {
+            border: 3px solid black;
+            border-radius: 10px;
             padding: 20px;
+            margin: 10px;
+            background-color: #f9f9f9;
+            flex: 1 1 calc(33.333% - 20px); /* three cards per row, minus the margin */
+            box-sizing: border-box;
+        }
+
+        .card-header {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .card-body {
+            margin-bottom: 10px;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .w3-button {
+            margin: 5px 0;
         }
 
         @media screen and (max-width: 768px) {
             .w3-container {
                 width: 100%;
             }
+
+            .card {
+                flex: 1 1 calc(50% - 20px); /* two cards per row for smaller screens */
+            }
         }
 
-        @media screen and (min-width: 768px) {
-            .w3-container {
-                width: 700px;
-                margin: 0 auto;
+        @media screen and (max-width: 480px) {
+            .card {
+                flex: 1 1 100%; /* one card per row for very small screens */
             }
         }
 
@@ -54,10 +82,6 @@
 
         .modal-content {
             padding: 20px;
-        }
-
-        .w3-button {
-            margin: 5px 0;
         }
 
         .pagination {
@@ -112,9 +136,8 @@
                 <button type="submit" class="w3-button w3-round w3-red">Logout</button>
             </form>
         </div>
-        
     </header>
-    
+
     <div class="w3-padding" style="max-width: 1000px; margin: auto; display: flex; justify-content: space-between; align-items: center;">
         <div>
             <input type="text" id="searchInput" class="w3-input w3-border w3-round" placeholder="Search users..." onkeyup="searchUsers()">
@@ -123,57 +146,46 @@
             <button class="w3-button w3-round w3-light-blue w3-margin" onclick="document.getElementById('newuser').style.display='block'; return false;">New User</button>
         </div>
     </div>
-    
+
     <div class="w3-padding" style="max-width: 1000px; margin: auto;">
-        <table class="w3-table w3-striped w3-bordered w3-light-green">
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>User ID</th>
-                    <th>User Name</th>
-                    <th>User Email</th>
-                    <th>Operations</th>
-                </tr>
-            </thead>
-            <tbody id="userTableBody">
-                @foreach ($listUser as $user)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $user->id }}</td>
-                    <td>{{ $user->name }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td>
-                        <div class="w3-cell">
-                            <form id="deleteForm{{ $user->id }}" method="POST" action="{{ route('user.delete', $user->id) }}" onsubmit="return confirm('Are you sure you want to delete this user?');">
-                                @csrf
-                                @method('DELETE')
-                            </form>
-                        </div>
-                        <div id="editUserModal{{ $user->id }}" class="w3-modal w3-animate-opacity">
-                            <div class="w3-modal-content w3-round" style="width: 500px;">
-                                <header class="w3-container modal-header">
-                                    <span onclick="document.getElementById('editUserModal{{ $user->id }}').style.display='none'" class="w3-button w3-display-topright">&times;</span>
-                                    <h4>Edit User</h4>
-                                </header>
-                                <div class="w3-padding modal-content">
-                                    <form method="POST" action="{{ route('user.update', $user->id) }}">
-                                        @csrf
-                                        <input type="hidden" name="_method" value="POST">
-                                        <p><input class="w3-input w3-round w3-border" type="text" name="name" placeholder="Name" value="{{ $user->name }}" required></p>
-                                        <p><input class="w3-input w3-round w3-border" type="email" name="email" placeholder="Email" value="{{ $user->email }}" required></p>
-                                        <p><input class="w3-input w3-round w3-border" type="password" name="password" placeholder="Password (leave blank for no change)"></p>
-                                        <button class="w3-button w3-blue w3-round" type="submit">Update</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        <button class="w3-button w3-round w3-block w3-blue" onclick="editUser('{{ $user->id }}', '{{ $user->name }}', '{{ $user->email }}')">Edit</button>
-                        <button class="w3-button w3-round w3-block w3-red" onclick="deleteUser('{{ $user->id }}')">Delete</button>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+        <div class="card-container" id="userCardContainer">
+            @foreach ($listUser as $user)
+            <div class="card">
+                <div class="card-header">User ID: {{ $user->id }}</div>
+                <div class="card-body">
+                    <p><strong>Name:</strong> {{ $user->name }}</p>
+                    <p><strong>Email:</strong> {{ $user->email }}</p>
+                </div>
+                <div class="card-footer">
+                    <button class="w3-button w3-blue w3-round" onclick="editUser('{{ $user->id }}', '{{ $user->name }}', '{{ $user->email }}')">Edit</button>
+                    <button class="w3-button w3-red w3-round" onclick="deleteUser('{{ $user->id }}')">Delete</button>
+                    <form id="deleteForm{{ $user->id }}" method="POST" action="{{ route('user.delete', $user->id) }}" style="display: none;">
+                        @csrf
+                        @method('DELETE')
+                    </form>
+                </div>
+            </div>
+
+            <div id="editUserModal{{ $user->id }}" class="w3-modal w3-animate-opacity">
+                <div class="w3-modal-content w3-round" style="width: 500px;">
+                    <header class="w3-container modal-header">
+                        <span onclick="document.getElementById('editUserModal{{ $user->id }}').style.display='none'" class="w3-button w3-display-topright">&times;</span>
+                        <h4>Edit User</h4>
+                    </header>
+                    <div class="w3-padding modal-content">
+                        <form method="POST" action="{{ route('user.update', $user->id) }}">
+                            @csrf
+                            <input type="hidden" name="_method" value="POST">
+                            <p><input class="w3-input w3-round w3-border" type="text" name="name" placeholder="Name" value="{{ $user->name }}" required></p>
+                            <p><input class="w3-input w3-round w3-border" type="email" name="email" placeholder="Email" value="{{ $user->email }}" required></p>
+                            <p><input class="w3-input w3-round w3-border" type="password" name="password" placeholder="Password (leave blank for no change)"></p>
+                            <button class="w3-button w3-blue w3-round" type="submit">Update</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
     </div>
 
     <div id="newuser" class="w3-modal w3-animate-opacity">
@@ -195,11 +207,10 @@
     </div>
 
     <script>
-        function editUser(id, name, email, password) {
+        function editUser(id, name, email) {
             document.getElementById('editUserModal' + id).style.display = 'block';
             document.querySelector('#editUserModal' + id + ' input[name="name"]').value = name;
             document.querySelector('#editUserModal' + id + ' input[name="email"]').value = email;
-            document.querySelector('#editUserModal' + id + ' input[name="password"]').value = password;
         }
 
         function deleteUser(id) {
@@ -209,23 +220,19 @@
         }
 
         function searchUsers() {
-            var input, filter, table, tr, td, i, txtValue;
+            var input, filter, container, cards, card, i, txtValue;
             input = document.getElementById('searchInput');
             filter = input.value.toLowerCase();
-            table = document.querySelector('.w3-table');
-            tr = table.getElementsByTagName('tr');
+            container = document.getElementById('userCardContainer');
+            cards = container.getElementsByClassName('card');
 
-            for (i = 1; i < tr.length; i++) {
-                tr[i].style.display = 'none';
-                td = tr[i].getElementsByTagName('td');
-                for (var j = 0; j < td.length; j++) {
-                    if (td[j]) {
-                        txtValue = td[j].textContent || td[j].innerText;
-                        if (txtValue.toLowerCase().indexOf(filter) > -1) {
-                            tr[i].style.display = '';
-                            break;
-                        }
-                    }
+            for (i = 0; i < cards.length; i++) {
+                card = cards[i];
+                txtValue = card.textContent || card.innerText;
+                if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
                 }
             }
         }
