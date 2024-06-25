@@ -84,27 +84,7 @@
             padding: 20px;
         }
 
-        .pagination {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .pagination button {
-            background-color: #f0f0f0;
-            color: #333;
-            border: none;
-            padding: 10px 15px;
-            margin: 0 5px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .pagination button.active {
-            background-color: #4CAF50;
-            color: white;
-        }
+       
     </style>
 </head>
 
