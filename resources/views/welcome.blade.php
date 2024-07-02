@@ -87,7 +87,7 @@
     </div>
     <header>
         <h1>Welcome to the Tutor System</h1>
-        <p>Manage your tutor sessions efficiently</p>
+        
     </header>
     <div class="subject-list">
         <div class="subject-item">
